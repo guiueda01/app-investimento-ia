@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MONO_INVEST // Terminal de Alocação Tática</title>
+    <style>
+        /* IMPORTAÇÃO DE FONTE ESTILO DATILOGRAFIA/MONOESPAÇADA */
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&display=swap');
+
+        :root {
+            --bg-dark: #000000;
+            --white-neon: #ffffff;
+            --black-contrast: #0a0a0a;
+            --text-main: #f8fafc;
+            --glass-bg: rgba(10, 10, 10, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fira Code', monospace;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px dashed var(--white-neon);
+            padding-bottom: 15px;
+        }
+
+        header h1 {
+            color: var(--white-neon);
+            font-size: 1.8rem;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* CARD GLASSMORPHISM NOVO (MONOCROMÁTICO) */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card h2 {
+            font-size: 1.2rem;
+            color: var(--white-neon);
+            margin-bottom: 20px;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* FORMULÁRIO / INPUTS */
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--white-neon);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+        }
+
+        /* BOTÃO PRETO E BRANCO INVERTIDO (Ação Principal com Fundo Preto) */
+        .btn-action {
+            width: 100%;
+            background: var(--white-neon);
+            border: 1px solid var(--white-neon);
+            color: var(--black-contrast);
+            padding: 14px;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            background: var(--black-contrast);
+            color: var(--white-neon);
+            border-color: var(--white-neon);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+        }
+
+        /* DISPLAY DE RESULTADOS COM CONTRASTE PRETO INTERNO */
+        .results-box {
+            margin-top: 20px;
+            background: var(--black-contrast);
+            border-radius: 4px;
+            padding: 15px;
+            display: none;
+            border: 1px solid var(--white-neon);
+        }
+
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+            padding-bottom: 4px;
+        }
+
+        .result-line:last-child {
+            border: none;
+            margin-bottom: 0;
+        }
+
+        .result-val {
+            font-weight: bold;
+            color: var(--white-neon);
+        }
+
+        /* ESTRATÉGIAS CRIPTO MANTENDO A IDENTIDADE PRETO E BRANCO */
+        .crypto-strategy {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .crypto-strategy:last-child {
+            border: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .crypto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .crypto-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--white-neon);
+            border-left: 2px solid var(--white-neon);
+            padding-left: 6px;
+        }
+
+        .crypto-tech-spec {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            text-align: justify;
+            line-height: 1.4;
+        }
+
+        .allocation-pill {
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white-neon);
+            padding: 2px 6px;
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: #64748b;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>[ ] MONO_INVEST_TERMINAL_v2.0</h1>
+        <p>Modelagem Preditiva de Capital & Alocação de Ativos Digitais // Edição Monocromática</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- COLUNA 1: CALCULADORA PREDITIVA -->
+        <section class="glass-card">
+            <h2><span>//</span> SIMULADOR_DE_METAS</h2>
+            
+            <div class="input-group">
+                <label for="initialValue">Aporte Inicial (R$)</label>
+                <input type="number" id="initialValue" value="1000" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="monthlyValue">Aporte Mensal Recorrente (R$)</label>
+                <input type="number" id="monthlyValue" value="200" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="targetValue">Objetivo Financeiro Final (R$)</label>
+                <input type="number" id="targetValue" value="50000" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="profileRate">Perfil de Alocação / Taxa Anual</label>
+                <select id="profileRate">
+                    <option value="10">Conservador (10% a.a. - Renda Fixa/IPCA+)</option>
+                    <option value="18" selected>Moderado/Intermediário (18% a.a. - Misto/FIIs/Ações)</option>
+                    <option value="35">Agressivo/Cripto (35% a.a. - Volatilidade Estruturada)</option>
+                </select>
+            </div>
+
+            <button class="btn-action" onclick="runCyberSimulation()">Executar Algoritmo</button>
+
+            <div id="resultsDisplay" class="results-box">
+                <div class="result-line">
+                    <span>Tempo para atingir o objetivo:</span>
+                    <span class="result-val" id="resTime">--</span>
+                </div>
+                <div class="result-line">
+                    <span>Total investido pelo usuário:</span>
+                    <span class="result-val" id="resInvested">--</span>
+                </div>
+                <div class="result-line">
+                    <span>Rendimento em juros acumulados:</span>
+                    <span class="result-val" id="resInterest">--</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- COLUNA 2: ESTRATÉGIAS DIGITAIS -->
+        <section class="glass-card">
+            <h2><span>//</span> ESTRATÉGIAS_CRIPTOGRAFADAS</h2>
+            
+            <div class="crypto-strategy">
+                <div class="crypto-header">
+                    <span class="crypto-name">BTC (Bitcoin)</span>
+                    <span class="allocation-pill">Peso Sugerido: 60% a 70%</span>
+                </div>
+                <p class="crypto-tech-spec">
+                    <strong>Tática de Acumulação Assimétrica:</strong> Foco em Reserva de Valor Digital. Para investidores iniciantes e intermediários, recomenda-se a estratégia de DCA (Dollar Cost Averaging), que consiste em compras fixas semanais ou mensais, mitigando o impacto da volatilidade de curto prazo do mercado e aproveitando a escassez matemática programada (limite de 21 milhões de unidades).
+                </p>
+            </div>
+
+            <div class="crypto-strategy">
+                <div class="crypto-header">
+                    <span class="crypto-name">ADA (Cardano)</span>
+                    <span class="allocation-pill">Peso Sugerido: 5% a 15%</span>
+                </div>
+                <p class="crypto-tech-spec">
+                    <strong>Tática de Geração de Rendimento Passivo:</strong> Ativo de utilidade baseado em contratos inteligentes e arquitetura científica de revisão por pares. A estratégia técnica foca em "Staking de Liquidez Não-Custodial". O investidor delega seus ativos para pools de validação sem travar as moedas, gerando recompensas recorrentes e adicionando um fluxo estável de acumulação à carteira cripto.
+                </p>
+            </div>
+
+            <div class="crypto-strategy" style="border: none; padding: 0;">
+                <div class="crypto-header">
+                    <span class="crypto-name">Regra de Rebalanceamento</span>
+                </div>
+                <p class="crypto-tech-spec">
+                    Monitore a volatilidade trimestralmente. Em ciclos de alta exponencial (*bull markets*), realize lucros parciais convertendo frações excedentes em ativos estáveis (*stablecoins*). Em ciclos de forte correção (*bear markets*), utilize o caixa gerado para reestabelecer as proporções originais do portfólio técnico.
+                </p>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        [SYS_STATUS: ONLINE] // Interface monocromática orientada a dados financeiros. Retornos passados não garantem performance futura.
+    </footer>
+
+    <script>
+        function runCyberSimulation() {
+            const initial = parseFloat(document.getElementById('initialValue').value) || 0;
+            const monthly = parseFloat(document.getElementById('monthlyValue').value) || 0;
+            const target = parseFloat(document.getElementById('targetValue').value) || 0;
+            const annualRate = parseFloat(document.getElementById('profileRate').value) || 0;
+
+            if (target <= initial) {
+                alert("ERRO_DO_SISTEMA: O valor objetivo deve ser maior que o aporte inicial.");
+                return;
+            }
+            if (monthly <= 0 && initial <= 0) {
+                alert("ERRO_DO_SISTEMA: Defina um fluxo de capital válido (Aporte Inicial ou Mensal).");
+                return;
+            }
+
+            const monthlyRate = Math.pow((1 + (annualRate / 100)), (1 / 12)) - 1;
+
+            let currentBalance = initial;
+            let months = 0;
+            let totalInvested = initial;
+
+            while (currentBalance < target && months < 600) {
+                months++;
+                const interest = currentBalance * monthlyRate;
+                currentBalance += interest + monthly;
+                totalInvested += monthly;
+            }
+
+            const totalInterest = currentBalance - totalInvested;
+
+            let timeString = "";
+            if (months >= 600) {
+                timeString = "Acima de 50 anos (Ajuste os aportes)";
+            } else {
+                const years = Math.floor(months / 12);
+                const remainingMonths = months % 12;
+                
+                if (years > 0) timeString += `${years} ano(s) `;
+                if (remainingMonths > 0) timeString += `${remainingMonths} mês(es)`;
+                if (months === 0) timeString = "Imediato";
+            }
+
+            document.getElementById('resTime').innerText = timeString;
+            document.getElementById('resInvested').innerText = totalInvested.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('resInterest').innerText = totalInterest.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            document.getElementById('resultsDisplay').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

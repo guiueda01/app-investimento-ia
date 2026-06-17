@@ -1,0 +1,15 @@
+tema: investimento
+site estatico
+html css js
+
+Contexto: uma ferramenta para investimento, sendo um sie criado em html css js
+
+Objetivo: inserir valores, mostrar objetivo e calcular em quanto tempo, valores posso chegar ate esse objetivo
+
+Estilo: glassmorfismo(css), paleta, estilo cyberpunk, cores e detalhes em preto e branco, futurista, fote estilo dadilografia
+
+Tom: Profissional, tecnico
+
+Audiência: investidores iniciantes e intermediarios.
+
+Formato da resposta: mostre uma calculadora de investimento e estrategias de investimento em moedas digital. como ADA e bitcoin
